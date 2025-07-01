@@ -1,10 +1,12 @@
 <?php 
 $servername="localhost";
-$database="login";
+$database="WMS";
 $username="root";
 $password="";
 
 $conn=new mysqli($servername,$database,$database,$password);
+ 
+require 'filename';
 
 if($conn->connect_error){
 die("connection falied:".$conn->connect_error);
@@ -13,7 +15,8 @@ echo "Connected successfully";
 
 
 
-if(isset($_POST['login'])){
+
+   if( $_SERVER["REQUEST_METHOD"]=="POST");
     $username = $_POST['username'];
     $password = $_POST['password'];
 
@@ -26,5 +29,5 @@ if(isset($_POST['login'])){
     } else {
         echo "Invalid email or password.";
     }
-}
+
 ?>
