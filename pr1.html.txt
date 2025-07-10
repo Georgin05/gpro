@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Warehouse Admin Dashboard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      height: 100vh;
+      background-color: #f5f6fa;
+    }
+    .sidebar {
+      width: 250px;
+      background-color: #2c3e50;
+      color: white;
+      padding-top: 20px;
+      position: fixed;
+      height: 100%;
+    }
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 22px;
+    }
+    .sidebar a {
+      display: block;
+      padding: 15px 25px;
+      color: white;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background-color: #1abc9c;
+    }
+    .main-content {
+      margin-left: 250px;
+      padding: 30px;
+      width: 100%;
+      overflow-y: auto;
+    }
+    .section {
+      display: none;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+    .section.active {
+      display: block;
+    }
+    h2 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #1abc9c;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>Warehouse Admin</h2>
+    <a href="#" class="active" onclick="showSection('products')">Product Details</a>
+    <a href="#" onclick="showSection('orders')">Order Details</a>
+    <a href="#" onclick="showSection('customers')">Customer Details</a>
+    <a href="#" onclick="showSection('suppliers')">Supplier Details</a>
+  </div>
+
+  <div class="main-content">
+    <div id="products" class="section active">
+      <h2>Product Details</h2>
+      <table>
+        <tr><th>ID</th><th>Name</th><th>Stock</th><th>Price</th></tr>
+        <tr><td>1</td><td>Laptop</td><td>20</td><td>₹55,000</td></tr>
+        <tr><td>2</td><td>Keyboard</td><td>50</td><td>₹800</td></tr>
+      </table>
+    </div>
+
+    <div id="orders" class="section">
+      <h2>Order Details</h2>
+      <table>
+        <tr><th>Order ID</th><th>Customer</th><th>Status</th><th>Amount</th></tr>
+        <tr><td>1001</td><td>John Doe</td><td>Shipped</td><td>₹58,000</td></tr>
+        <tr><td>1002</td><td>Jane Smith</td><td>Pending</td><td>₹1,200</td></tr>
+      </table>
+    </div>
+
+    <div id="customers" class="section">
+      <h2>Customer Details</h2>
+      <table>
+        <tr><th>ID</th><th>Name</th><th>Email</th></tr>
+        <tr><td>1</td><td>John Doe</td><td>john@example.com</td></tr>
+        <tr><td>2</td><td>Jane Smith</td><td>jane@example.com</td></tr>
+      </table>
+    </div>
+
+    <div id="suppliers" class="section">
+      <h2>Supplier Details</h2>
+      <table>
+        <tr><th>ID</th><th>Name</th><th>Contact</th></tr>
+        <tr><td>1</td><td>ABC Traders</td><td>abc@traders.com</td></tr>
+        <tr><td>2</td><td>XYZ Supplies</td><td>xyz@supplies.com</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.getElementById(id).classList.add('active');
+
+      document.querySelectorAll('.sidebar a').forEach(link => {
+        link.classList.remove('active');
+      });
+      event.target.classList.add('active');
+    }
+  </script>
+
+</body>
+</html>

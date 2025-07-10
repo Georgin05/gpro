@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Damage Claim - Moveto</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .hero-section {
+      background: url('your-banner-image.jpg') no-repeat center center/cover;
+      height: 300px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+    .section-title {
+      margin-top: 60px;
+      margin-bottom: 20px;
+    }
+    .claim-steps i {
+      font-size: 30px;
+      margin-right: 10px;
+      color: orange;
+    }
+    .faq .accordion-button::after {
+      background-image: none;
+    }
+    footer {
+      background: #f8f9fa;
+      padding: 40px 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="#">🧭 Moveto</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navmenu">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Services</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Moving Planner</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Pages</a></li>
+      </ul>
+      <a class="btn btn-warning" href="#">Get a Quote</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="overlay"></div>
+  <div class="hero-content text-center">
+    <h1>Damage Claim</h1>
+    <p><a href="#">Home</a> / Claim</p>
+  </div>
+</section>
+
+<!-- Claim Section -->
+<section class="container my-5">
+  <div class="row align-items-center">
+    <div class="col-md-6">
+      <img src="https://via.placeholder.com/500x300" class="img-fluid mb-4" alt="Boxes">
+      <h3>Broken Stuff After Using Our Service?</h3>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fill the form below to submit a damage claim.</p>
+      <a href="#claim-form" class="btn btn-primary">Start Claim</a>
+    </div>
+    <div class="col-md-6" id="claim-form">
+      <h4 class="mb-3">Fill The Form Below</h4>
+      <form>
+        <div class="mb-2">
+          <input type="text" class="form-control" placeholder="Name" required>
+        </div>
+        <div class="mb-2">
+          <input type="text" class="form-control" placeholder="Phone" required>
+        </div>
+        <div class="mb-2">
+          <input type="email" class="form-control" placeholder="Email" required>
+        </div>
+        <div class="mb-2">
+          <input type="text" class="form-control" placeholder="Order ID" required>
+        </div>
+        <div class="mb-3">
+          <textarea class="form-control" rows="3" placeholder="Describe your broken stuff..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-warning w-100">Claim Now</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Claim Steps -->
+<section class="container my-5">
+  <h4 class="section-title">Don't Worry, Just Simple Steps To Claim</h4>
+  <div class="row claim-steps">
+    <div class="col-md-4">
+
+Unni, [7/5/2025 9:13 AM]
+<h5><i class="bi bi-file-earmark-text"></i> Fill Form Claim</h5>
+      <p>Submit your order and contact details through the form.</p>
+    </div>
+    <div class="col-md-4">
+      <h5><i class="bi bi-box-seam"></i> Review Your Broken Stuff</h5>
+      <p>Our team will review your broken items based on the form.</p>
+    </div>
+    <div class="col-md-4">
+      <h5><i class="bi bi-credit-card"></i> Pay Your Claim</h5>
+      <p>Once approved, your claim payment or compensation is processed.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="container my-5 faq">
+  <h4 class="section-title">Frequently Asked Questions</h4>
+  <div class="accordion" id="faqAccordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingOne">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+          Where Can I Find Information?
+        </button>
+      </h2>
+      <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          All important information is provided on our website and support pages.
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+          What Are Your Terms And Conditions?
+        </button>
+      </h2>
+      <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">Our terms are available in the footer section and at checkout.</div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+          What Kinds of Payment Do You Accept?
+        </button>
+      </h2>
+      <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">We accept credit/debit cards, UPI, and bank transfers.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="text-center">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        <h5>Our Services</h5>
+        <p>International Moves<br>Domestic Moves<br>Office Moves</p>
+      </div>
+      <div class="col-md-4">
+        <h5>Our Network</h5>
+        <p>Asia<br>Europe<br>Middle East</p>
+      </div>
+      <div class="col-md-4">
+        <h5>Subscribe Newsletter</h5>
+        <form class="d-flex justify-content-center">
+          <input type="email" class="form-control w-75" placeholder="Enter your email">
+          <button class="btn btn-warning ms-2">Sign Up</button>
+        </form>
+      </div>
+    </div>
+    <p class="mt-4">&copy; 2025 Moveto. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
