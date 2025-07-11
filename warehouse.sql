@@ -1,114 +1,116 @@
-create database warehouse;
-use warehouse;
+-- Create the warehouse database
+CREATE DATABASE IF NOT EXISTS warehouse;
+USE warehouse;
 
-create table users (
-    user_id int auto_increment primary key,
-    username varchar(50) not null unique,
-    password_hash varchar(255) not null,
-    role enum(admin,staff) not null,
-    created_at datetime not null default current_timestamp
+-- Users table
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'staff') NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-
-create table customers (
-    customer_id int auto_increment primary key,
-    cus_name varchar(50) not null,
-    email varchar(100) not null unique,
-    phone varchar(15)
+-- Customers table
+CREATE TABLE customers (
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    cus_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    phone VARCHAR(15),
     billing_address TEXT,
     shipping_address TEXT,
-    created at TIMESTAMP DEFAULT current_timestamp
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-create table suppliers (
-    supplier_id int auto_increment primary key,
-    name varchar(100) not null,
-    company_name varchar(100) not null unique,
-    contact_name varchar(50),
-    phone varchar(15),
-    address text,
-    email varchar(100)
-   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- Suppliers table
+CREATE TABLE suppliers (
+    supplier_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    company_name VARCHAR(100) NOT NULL UNIQUE,
+    contact_name VARCHAR(50),
+    phone VARCHAR(15),
+    address TEXT,
+    email VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-create table products (
-    product_id int auto_increment primary key,
-    name varchar(100) not null,
-    description text,
-    price decimal(10, 2) not null,
+-- Products table
+CREATE TABLE products (
+    product_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL,
     reorder_level INT DEFAULT 10,
-    stock int not null default 0
-);  
-
-
-create table categories (
-    category_id int auto_increment primary key,
-    name varchar(50) not null unique,
-    description text
+    stock INT NOT NULL DEFAULT 0
 );
 
-
-create table orders (
-    order_id int auto_increment primary key,
-    customer_id int not null,
-    order_date datetime not null default current_timestamp,
-    total_amount decimal(10, 2) not null,
-     status ENUM('Pending', 'Packed', 'Shipped', 'Delivered', 'Cancelled') DEFAULT 'Pending',
-    foreign key (customer_id) references customers(customer_id)
+-- Categories table
+CREATE TABLE categories (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT
 );
 
-create table order_items (
-    order_item_id int auto_increment primary key,
-    order_id int not null,
-    product_id int not null,
-    category_id int not null,
-    quantity int not null default 1,
-    price decimal(10, 2) not null,
-    foreign key (category_id) references categories(category_id),
-    foreign key (order_id) references orders(order_id),
-    foreign key (product_id) references products(product_id)
+-- Orders table
+CREATE TABLE orders (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    order_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status ENUM('Pending', 'Packed', 'Shipped', 'Delivered', 'Cancelled') DEFAULT 'Pending',
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
 );
-create table inventory (
-    inventory_id int auto_increment primary key,
-    product_id int not null,
-    quantity int not null default 0,
-    last_updated datetime not null default current_timestamp on update current_timestamp,
+
+-- Order items table
+CREATE TABLE order_items (
+    order_item_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    category_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    price DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (category_id) REFERENCES categories(category_id),
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+-- Inventory table
+CREATE TABLE inventory (
+    inventory_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 0,
+    last_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     reorder_level INT NOT NULL DEFAULT 10,
-    foreign key (product_id) references products(product_id)
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
 
-
-
--- Main return orders table
+-- Return orders table
 CREATE TABLE return_orders (
-    return_order_id INT PRIMARY KEY AUTO_INCREMENT,
+    return_order_id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
     customer_id INT NOT NULL,
     return_date DATE DEFAULT CURRENT_DATE,
     status ENUM('Pending', 'Approved', 'Rejected', 'Completed') DEFAULT 'Pending',
     refund_status ENUM('Not Issued', 'Issued', 'Store Credit') DEFAULT 'Not Issued',
     notes TEXT,
-
-    -- Foreign key relationships
     FOREIGN KEY (order_id) REFERENCES orders(order_id),
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
 );
 
 -- Return order items table
 CREATE TABLE return_order_items (
-    return_item_id INT PRIMARY KEY AUTO_INCREMENT,
+    return_item_id INT AUTO_INCREMENT PRIMARY KEY,
     return_order_id INT NOT NULL,
     product_id INT NOT NULL,
     quantity INT NOT NULL CHECK (quantity > 0),
     reason VARCHAR(255),
-
-    -- Foreign key relationships
     FOREIGN KEY (return_order_id) REFERENCES return_orders(return_order_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id)
-); 
+);
 
+-- Customer payments table
 CREATE TABLE customer_payments (
-    payment_id INT PRIMARY KEY AUTO_INCREMENT,
+    payment_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT NOT NULL,
     order_id INT NOT NULL,
     amount_paid DECIMAL(10,2),
@@ -119,8 +121,19 @@ CREATE TABLE customer_payments (
     FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
 
+-- Purchase orders table (needed for supplier_payments)
+CREATE TABLE purchase_orders (
+    purchase_order_id INT AUTO_INCREMENT PRIMARY KEY,
+    supplier_id INT NOT NULL,
+    order_date DATE DEFAULT CURRENT_DATE,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status ENUM('Pending', 'Received', 'Cancelled') DEFAULT 'Pending',
+    FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id)
+);
+
+-- Supplier payments table
 CREATE TABLE supplier_payments (
-    payment_id INT PRIMARY KEY AUTO_INCREMENT,
+    payment_id INT AUTO_INCREMENT PRIMARY KEY,
     supplier_id INT NOT NULL,
     purchase_order_id INT NOT NULL,
     amount_paid DECIMAL(10,2),
@@ -130,6 +143,7 @@ CREATE TABLE supplier_payments (
     FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id),
     FOREIGN KEY (purchase_order_id) REFERENCES purchase_orders(purchase_order_id)
 );
+
 
 
 
