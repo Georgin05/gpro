@@ -1,59 +1,54 @@
 <?php
+require 'config.php'; // Database connection
 session_start();
-$error = '';
-$success = '';
+
+$message = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
+    $confirm = $_POST['confirm_password'];
+    $role = $_POST['role'];
 
-    if (empty($username) || empty($password) || empty($confirm_password)) {
-        $error = "Please fill in all fields.";
-    } elseif ($password !== $confirm_password) {
-        $error = "Passwords do not match.";
+    if (empty($username) || empty($password) || empty($confirm) || empty($role)) {
+        $message = "All fields are required.";
+    } elseif ($password !== $confirm) {
+        $message = "Passwords do not match.";
+    } elseif (!in_array($role, ['admin', 'staff'])) {
+        $message = "Invalid role selected.";
     } else {
-        // Database connection
-        $conn = new mysqli('localhost', 'root', '', 'warehouse_db');
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
+        $check = $conn->prepare("SELECT user_id FROM users WHERE username = ?");
+        $check->bind_param("s", $username);
+        $check->execute();
+        $check->store_result();
 
-        // Check if username already exists
-        $stmt = $conn->prepare("SELECT username FROM users WHERE username = ?");
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $stmt->store_result();
-
-        if ($stmt->num_rows > 0) {
-            $error = "Username already taken. Please choose another.";
+        if ($check->num_rows > 0) {
+            $message = "❌ Username already taken.";
         } else {
-            // Insert new user with hashed password
-            $stmt->close();
-            $password_hash = hash('sha256', $password);
-            $insert = $conn->prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)");
-            $insert->bind_param("ss", $username, $password_hash);
-            if ($insert->execute()) {
-                $success = "Registration successful! You can now <a href='login.php'>login</a>.";
+            $check->close();
+
+            $hashed = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $conn->prepare("INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)");
+            $stmt->bind_param("sss", $username, $hashed, $role);
+
+            if ($stmt->execute()) {
+                header("Location: login.php?register=success");
+                exit();
             } else {
-                $error = "Error occurred during registration. Please try again.";
+                $message = "❌ Registration failed. Try again.";
             }
-            $insert->close();
+            $stmt->close();
         }
-        $stmt->close();
-        $conn->close();
     }
 }
 ?>
 
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Register | WMS</title>
+  <title>Register User</title>
   <style>
-    /* Reset */
     * {
       margin: 0;
       padding: 0;
@@ -73,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       padding: 20px;
     }
 
-    .register-container {
+    .login-container {
       background: rgba(255, 255, 255, 0.95);
       padding: 40px 35px;
       border-radius: 12px;
@@ -104,7 +99,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     input[type="text"],
-    input[type="password"] {
+    input[type="password"],
+    select {
       width: 100%;
       padding: 12px 15px;
       font-size: 16px;
@@ -114,7 +110,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     input[type="text"]:focus,
-    input[type="password"]:focus {
+    input[type="password"]:focus,
+    select:focus {
       border-color: #0d5ea6;
       outline: none;
     }
@@ -136,72 +133,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       background-color: #094a82;
     }
 
-    .login-link {
-      margin-top: 25px;
-      font-size: 14px;
-      color: #444;
-    }
-
-    .login-link a {
-      color: #0d5ea6;
-      text-decoration: none;
-      font-weight: 600;
-      transition: text-decoration 0.3s ease;
-    }
-
-    .login-link a:hover {
-      text-decoration: underline;
-    }
-
     .error-message {
-      margin-bottom: 18px;
+      margin-top: 15px;
       color: #d32f2f;
       font-weight: 600;
       font-size: 14px;
-      text-align: center;
-    }
-
-    .success-message {
-      margin-bottom: 18px;
-      color: #2e7d32;
-      font-weight: 600;
-      font-size: 14px;
-      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div class="register-container">
-    <h2>Create Your Account</h2>
 
-    <?php if (!empty($error)): ?>
-      <p class="error-message"><?php echo htmlspecialchars($error); ?></p>
-    <?php elseif (!empty($success)): ?>
-      <p class="success-message"><?php echo $success; ?></p>
+<div class="login-container">
+  <h2>Register</h2>
+  <form method="POST" action="">
+    <div class="input-group">
+      <label>Username</label>
+      <input type="text" name="username" required>
+    </div>
+
+    <div class="input-group">
+      <label>Password</label>
+      <input type="password" name="password" required>
+    </div>
+
+    <div class="input-group">
+      <label>Re-enter Password</label>
+      <input type="password" name="confirm_password" required>
+    </div>
+
+    <div class="input-group">
+      <label>User Role</label>
+      <select name="role" required>
+        <option value="">Select Role</option>
+        <option value="admin">Admin</option>
+        <option value="staff">Staff</option>
+      </select>
+    </div>
+
+    <button type="submit">Register</button>
+
+    <?php if (!empty($message)): ?>
+      <div class="error-message"><?= htmlspecialchars($message) ?></div>
     <?php endif; ?>
+  </form>
+</div>
 
-    <form action="register.php" method="post" autocomplete="off">
-      <div class="input-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" required autofocus />
-      </div>
-
-      <div class="input-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required />
-      </div>
-
-      <div class="input-group">
-        <label for="confirm_password">Confirm Password</label>
-        <input type="password" id="confirm_password" name="confirm_password" required />
-      </div>
-
-      <button type="submit">Register</button>
-    </form>
-
-    <p class="login-link">
-      Already have an account? <a href="login.php">Login here</a>
-    </p>
-  </div>
 </body>
 </html>
