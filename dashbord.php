@@ -1,14 +1,19 @@
-<?php
 
-include"conn.php";
+<?php
+include "conn.php";
 session_start();
 
+// Check if session data exists
+if (!isset($_SESSION['users'])) {
+    // Redirect if not logged in
+    header("Location: loginx.php");
+    exit;
+}
 
-
-// Get user data from session
-$user = $_SESSION['user'];
-
+// Safe to access
+$user = $_SESSION['users'];
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -386,7 +391,7 @@ body {
                         <h4><?php echo htmlspecialchars($user['full_name']); ?></h4>
                         <p><?php echo htmlspecialchars($user['user_type']); ?></p>
                     </div>
-                    <img src="LUFFY.jpg" class="zoom-img" alt="User">
+                    <img src="LUFFY.jpg" class="zoom-img" alt="Users">
                 </div>
             </div>
 
