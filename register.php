@@ -1,50 +1,68 @@
-
 <?php
-include 'conn.php';
+require 'conn.php'; // DB connection
 session_start();
 
 $message = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
+    // Grab inputs
+    $fullName   = trim($_POST['fullName'] ?? '');
+    $email      = trim($_POST['email'] ?? '');
+    $phone      = trim($_POST['phone'] ?? '');
+    $userType   = $_POST['userType'] ?? '';
+    $department = $_POST['department'] ?? '';
+    $password   = $_POST['password'] ?? '';
+    $confirm    = $_POST['confirmPassword'] ?? '';
 
-    if (empty($email) || empty($password)) {
-        $message = "❌ Please fill in both fields.";
+    // Validate required fields
+    if (empty($fullName) || empty($email) || empty($phone) || empty($userType) || empty($department) || empty($password) || empty($confirm)) {
+        $message = "❌ All fields are required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $message = "❌ Invalid email format.";
+    } elseif ($password !== $confirm) {
+        $message = "❌ Passwords do not match.";
+    } elseif (!in_array($userType, ['admin', 'staff'])) {
+        $message = "❌ Invalid user type selected.";
+    } elseif (!in_array($department, ['inventory', 'shipping', 'quality', 'logistics', 'admin'])) {
+        $message = "❌ Invalid department selected.";
     } else {
-        $stmt = $conn->prepare("SELECT user_id, full_name, password_hash, user_type FROM users WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $stmt->store_result();
+        // Check if email already exists
+        $check = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
+        $check->bind_param("s", $email);
+        $check->execute();
+        $check->store_result();
 
-        if ($stmt->num_rows === 1) {
-            $stmt->bind_result($user_id, $full_name, $password_hash, $user_type);
-            $stmt->fetch();
+        if ($check->num_rows > 0) {
+            $message = "❌ Email already registered.";
+        } else {
+            $check->close();
 
-            if (password_verify($password, $password_hash)) {
-                $_SESSION['user_id'] = $user_id;
-                $_SESSION['full_name'] = $full_name;
-                $_SESSION['user_type'] = $user_type;
-                header("Location: dashboard.php");
+            // Hash password
+            $hashed = password_hash($password, PASSWORD_DEFAULT);
+
+            // Insert user
+            $stmt = $conn->prepare("INSERT INTO users (full_name, email, phone, user_type, department, password_hash) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssss", $fullName, $email, $phone, $userType, $department, $hashed);
+
+            if ($stmt->execute()) {
+                header("Location: login.php?register=success");
                 exit();
             } else {
-                $message = "❌ Incorrect password.";
+                $message = "❌ Registration failed. Please try again.";
             }
-        } else {
-            $message = "❌ Email not found.";
+            $stmt->close();
         }
-
-        $stmt->close();
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WarehousePro - Login</title>
+    <title>WarehousePro - Register</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -194,15 +212,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* Login Section */
-        .login-section {
+        /* Register Section */
+        .register-section {
             display: flex;
             min-height: calc(100vh - 70px);
             align-items: center;
             padding: 60px 0;
         }
 
-        .login-container {
+        .register-container {
             display: flex;
             width: 100%;
             max-width: 1000px;
@@ -213,14 +231,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: var(--shadow);
         }
 
-        .dark-mode .login-container {
+        .dark-mode .register-container {
             background-color: #1e1e1e;
         }
 
-        .login-image {
+        .register-image {
             flex: 1;
             background: linear-gradient(135deg, rgba(26, 54, 93, 0.9) 0%, rgba(42, 157, 143, 0.8) 100%), 
-                        url('https://images.unsplash.com/photo-1600585152220-90363fe7e115?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
+                        url('https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -229,44 +247,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             position: relative;
         }
 
-        .login-image h2 {
+        .register-image h2 {
             font-size: 32px;
             margin-bottom: 20px;
             position: relative;
             z-index: 1;
         }
 
-        .login-image p {
+        .register-image p {
             margin-bottom: 30px;
             opacity: 0.9;
             position: relative;
             z-index: 1;
         }
 
-        .login-image ul {
+        .register-image ul {
             list-style: none;
             margin-bottom: 40px;
             position: relative;
             z-index: 1;
         }
 
-        .login-image li {
+        .register-image li {
             margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .login-image i {
+        .register-image i {
             color: var(--accent);
         }
 
-        .login-form {
+        .register-form {
             flex: 1;
             padding: 60px 40px;
         }
 
-        .dark-mode .login-form {
+        .dark-mode .register-form {
             color: var(--text);
         }
 
@@ -330,32 +348,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.2);
         }
 
-        .remember-forgot {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+        .select-control {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: var(--light);
+            color: var(--text);
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
         }
 
-        .remember-me {
+        .dark-mode .select-control {
+            border-color: #444;
+            background-color: #2d2d2d;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        }
+
+        .select-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.2);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .radio-option {
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .remember-me input {
+        .radio-option input {
             width: 16px;
             height: 16px;
-        }
-
-        .forgot-password {
-            color: var(--secondary);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .forgot-password:hover {
-            text-decoration: underline;
         }
 
         .form-footer {
@@ -378,76 +413,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-decoration: underline;
         }
 
-        /* Social Login */
-        .social-login {
-            margin: 30px 0;
-            text-align: center;
-        }
-
-        .social-login p {
-            position: relative;
-            color: var(--gray);
-            margin-bottom: 20px;
-        }
-
-        .social-login p::before,
-        .social-login p::after {
-            content: "";
-            position: absolute;
-            height: 1px;
-            width: 30%;
-            background-color: #ddd;
-            top: 50%;
-        }
-
-        .dark-mode .social-login p::before,
-        .dark-mode .social-login p::after {
-            background-color: #444;
-        }
-
-        .social-login p::before {
-            left: 0;
-        }
-
-        .social-login p::after {
-            right: 0;
-        }
-
-        .social-icons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .social-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-            transition: var(--transition);
-            cursor: pointer;
-        }
-
-        .social-icon:hover {
-            transform: translateY(-3px);
-        }
-
-        .google {
-            background-color: #DB4437;
-        }
-
-        .microsoft {
-            background-color: #00A1F1;
-        }
-
-        .linkedin {
-            background-color: #0077B5;
-        }
-
         /* Footer */
         footer {
             background: linear-gradient(135deg, var(--primary) 0%, #1a365d 100%);
@@ -463,22 +428,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         /* Responsive Styles */
         @media (max-width: 992px) {
-            .login-container {
+            .register-container {
                 flex-direction: column;
                 max-width: 600px;
             }
             
-            .login-image {
+            .register-image {
                 padding: 30px;
             }
             
-            .login-form {
+            .register-form {
                 padding: 40px 30px;
             }
         }
 
         @media (max-width: 576px) {
-            .login-image h2 {
+            .register-image h2 {
                 font-size: 26px;
             }
             
@@ -490,10 +455,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 padding: 12px 15px 12px 40px;
             }
             
-            .remember-forgot {
+            .radio-group {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
+                gap: 10px;
             }
         }
     </style>
@@ -514,78 +478,196 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </header>
 
-    <!-- Login Section -->
-    <section class="login-section">
+    <!-- Register Section -->
+    <section class="register-section">
         <div class="container">
-            <div class="login-container">
-                <div class="login-image">
-                    <h2>Welcome to WarehousePro</h2>
-                    <p>Log in to access your warehouse management dashboard and streamline your inventory operations.</p>
+            <div class="register-container">
+                <div class="register-image">
+                    <h2>Join WarehousePro</h2>
+                    <p>Register your account to access our comprehensive warehouse management system and optimize your inventory operations.</p>
                     
                     <ul>
-                        <li><i class="fas fa-check-circle"></i> Real-time inventory tracking</li>
-                        <li><i class="fas fa-check-circle"></i> Automated stock management</li>
-                        <li><i class="fas fa-check-circle"></i> Advanced reporting tools</li>
-                        <li><i class="fas fa-check-circle"></i> Multi-location support</li>
+                        <li><i class="fas fa-check-circle"></i> Streamline your warehouse operations</li>
+                        <li><i class="fas fa-check-circle"></i> Track inventory in real-time</li>
+                        <li><i class="fas fa-check-circle"></i> Generate detailed reports</li>
+                        <li><i class="fas fa-check-circle"></i> Manage multiple warehouse locations</li>
                     </ul>
                     
-                    <p>Don't have an account? <a href="registerx.php" style="color: var(--accent); font-weight: 500;"> click here</a></p>
+                    <p>Already have an account? <a href="login.php" style="color: var(--accent); font-weight: 500;">Sign in here</a></p>
                 </div>
                 
-                <div class="login-form"  >>
+                <div class="register-form">
                     <div class="form-header">
-                        <h2>Sign In</h2>
-                        <p>Enter your credentials to access your account</p>
+                        <h2>Create Account</h2>
+                        <p>Fill in your details to register</p>
                     </div>
                     
-                    <form id="loginForm" method="POST" action="dashboard.php">
+                    <?php
+                    // Initialize variables
+                    $fullName = $email = $phone = $userType = $department = '';
+                    $errors = [];
+                    
+                    // Check if form is submitted
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        // Validate and sanitize inputs
+                        $fullName = htmlspecialchars(trim($_POST['fullName'] ?? ''));
+                        $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+                        $phone = htmlspecialchars(trim($_POST['phone'] ?? ''));
+                        $userType = htmlspecialchars(trim($_POST['userType'] ?? ''));
+                        $department = htmlspecialchars(trim($_POST['department'] ?? ''));
+                        $password = $_POST['password'] ?? '';
+                        $confirmPassword = $_POST['confirmPassword'] ?? '';
+                        
+                        // Validation
+                        if (empty($fullName)) {
+                            $errors['fullName'] = 'Full name is required';
+                        }
+                        
+                        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                            $errors['email'] = 'Valid email is required';
+                        }
+                        
+                        if (empty($phone)) {
+                            $errors['phone'] = 'Phone number is required';
+                        }
+                        
+                        if (empty($userType) || !in_array($userType, ['admin', 'staff'])) {
+                            $errors['userType'] = 'Please select a valid user type';
+                        }
+                        
+                        if (empty($department)) {
+                            $errors['department'] = 'Please select a department';
+                        }
+                        
+                        if (empty($password)) {
+                            $errors['password'] = 'Password is required';
+                        } elseif (strlen($password) < 8) {
+                            $errors['password'] = 'Password must be at least 8 characters';
+                        }
+                        
+                        if ($password !== $confirmPassword) {
+                            $errors['confirmPassword'] = 'Passwords do not match';
+                        }
+                        
+                        // If no errors, process registration
+                        if (empty($errors)) {
+                            // In a real application, you would:
+                            // 1. Hash the password
+                            // 2. Save to database
+                            // 3. Redirect to success page or login
+                            
+                            // For demonstration, we'll just show a success message
+                            echo '<div class="alert alert-success" style="background-color: var(--success); color: white; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                Registration successful! You can now <a href="login.php" style="color: white; text-decoration: underline;">login</a>.
+                            </div>';
+                            
+                            // Reset form fields
+                            $fullName = $email = $phone = $userType = $department = '';
+                        }
+                    }
+                    ?>
+                    
+                    <form id="registrationForm" method="POST" action="">
+                        <div class="form-group">
+                            <label for="fullName">Full Name</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="fullName" name="fullName" class="form-control" placeholder="John Smith" 
+                                       value="<?php echo htmlspecialchars($fullName); ?>" required>
+                            </div>
+                            <?php if (isset($errors['fullName'])): ?>
+                                <small style="color: var(--danger);"><?php echo $errors['fullName']; ?></small>
+                            <?php endif; ?>
+                        </div>
+                        
                         <div class="form-group">
                             <label for="email">Email Address</label>
                             <div class="input-with-icon">
                                 <i class="fas fa-envelope"></i>
-                                <input type="email" id="email" class="form-control" placeholder="john@example.com" required>
+                                <input type="email" id="email" name="email" class="form-control" placeholder="john@example.com" 
+                                       value="<?php echo htmlspecialchars($email); ?>" required>
                             </div>
+                            <?php if (isset($errors['email'])): ?>
+                                <small style="color: var(--danger);"><?php echo $errors['email']; ?></small>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-phone"></i>
+                                <input type="tel" id="phone" name="phone" class="form-control" placeholder="+1 (555) 123-4567" 
+                                       value="<?php echo htmlspecialchars($phone); ?>" required>
+                            </div>
+                            <?php if (isset($errors['phone'])): ?>
+                                <small style="color: var(--danger);"><?php echo $errors['phone']; ?></small>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>User Type</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="admin" name="userType" value="admin" 
+                                           <?php echo ($userType === 'admin') ? 'checked' : ''; ?> required>
+                                    <label for="admin">Administrator</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="staff" name="userType" value="staff" 
+                                           <?php echo ($userType === 'staff') ? 'checked' : ''; ?> required>
+                                    <label for="staff">Staff Member</label>
+                                </div>
+                            </div>
+                            <?php if (isset($errors['userType'])): ?>
+                                <small style="color: var(--danger);"><?php echo $errors['userType']; ?></small>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="department">Department</label>
+                            <select id="department" name="department" class="select-control" required>
+                                <option value="">Select Department</option>
+                                <option value="inventory" <?php echo ($department === 'inventory') ? 'selected' : ''; ?>>Inventory Management</option>
+                                <option value="shipping" <?php echo ($department === 'shipping') ? 'selected' : ''; ?>>Shipping & Receiving</option>
+                                <option value="quality" <?php echo ($department === 'quality') ? 'selected' : ''; ?>>Quality Control</option>
+                                <option value="logistics" <?php echo ($department === 'logistics') ? 'selected' : ''; ?>>Logistics</option>
+                                <option value="admin" <?php echo ($department === 'admin') ? 'selected' : ''; ?>>Administration</option>
+                            </select>
+                            <?php if (isset($errors['department'])): ?>
+                                <small style="color: var(--danger);"><?php echo $errors['department']; ?></small>
+                            <?php endif; ?>
                         </div>
                         
                         <div class="form-group">
                             <label for="password">Password</label>
                             <div class="input-with-icon">
                                 <i class="fas fa-lock"></i>
-                                <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+                                <input type="password" id="password" name="password" class="form-control" placeholder="Create a password" required>
                             </div>
+                            <?php if (isset($errors['password'])): ?>
+                                <small style="color: var(--danger);"><?php echo $errors['password']; ?></small>
+                            <?php endif; ?>
                         </div>
                         
-                        <div class="remember-forgot">
-                            <div class="remember-me">
-                                <input type="checkbox" id="remember">
-                                <label for="remember">Remember me</label>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm your password" required>
                             </div>
-                            <a href="#" class="forgot-password">Forgot password?</a>
+                            <?php if (isset($errors['confirmPassword'])): ?>
+                                <small style="color: var(--danger);"><?php echo $errors['confirmPassword']; ?></small>
+                            <?php endif; ?>
                         </div>
                         
                         <div class="form-group" style="margin-top: 30px;">
                             <button type="submit" class="btn" style="width: 100%;">
-                                <i class="fas fa-sign-in-alt"></i> Sign In
+                                <i class="fas fa-user-plus"></i> Register Account
                             </button>
                         </div>
                         
-                        <div class="social-login">
-                            <p>Or sign in with</p>
-                            <div class="social-icons">
-                                <div class="social-icon google">
-                                    <i class="fab fa-google"></i>
-                                </div>
-                                <div class="social-icon microsoft">
-                                    <i class="fab fa-microsoft"></i>
-                                </div>
-                                <div class="social-icon linkedin">
-                                    <i class="fab fa-linkedin-in"></i>
-                                </div>
-                            </div>
-                        </div>
-                        
                         <div class="form-footer">
-                            <p>By signing in, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+                            <p>By registering, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
                         </div>
                     </form>
                 </div>
@@ -597,24 +679,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <footer>
         <div class="container">
             <div class="copyright">
-                &copy; 2023 WarehousePro Management System. All rights reserved.
+                &copy; <?php echo date('Y'); ?> WarehousePro Management System. All rights reserved.
             </div>
         </div>
     </footer>
 
     <script>
-    
-
-        // Social login buttons
-        document.querySelectorAll('.social-icon').forEach(icon => {
-            icon.addEventListener('click', function() {
-                const provider = this.classList.contains('google') ? 'Google' : 
-                               this.classList.contains('microsoft') ? 'Microsoft' : 'LinkedIn';
-                alert(`Redirecting to ${provider} login...`);
-                // In a real app, this would redirect to the OAuth provider
-            });
-        });
-
         // Theme toggle functionality
         const themeToggle = document.getElementById('themeToggle');
         const icon = themeToggle.querySelector('i');
@@ -643,15 +713,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             icon.classList.remove('fa-moon');
             icon.classList.add('fa-sun');
         }
-
-        // Forgot password functionality
-        document.querySelector('.forgot-password').addEventListener('click', function(e) {
-            e.preventDefault();
-            const email = prompt('Please enter your email address to reset your password:');
-            if (email) {
-                alert(`Password reset link has been sent to ${email}`);
-            }
-        });
     </script>
 </body>
-</html> 
+</html>
