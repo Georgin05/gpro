@@ -1,7 +1,6 @@
-
 <?php
-include 'conn.php';
 session_start();
+require 'conn.php'; // Ensure this file establishes a $conn variable
 
 $message = "";
 
@@ -25,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user_id'] = $user_id;
                 $_SESSION['full_name'] = $full_name;
                 $_SESSION['user_type'] = $user_type;
+
                 header("Location: dashboard.php");
                 exit();
             } else {
