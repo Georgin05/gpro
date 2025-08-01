@@ -4,7 +4,7 @@ include "conn.php";
 session_start();
 
 // Check if session data exists
-if (!isset($_SESSION['users'])) {
+if (!isset($_SESSION['user_id'])) {
     // Redirect if not logged in
     header("Location: loginx.php");
     exit;
@@ -349,7 +349,7 @@ body {
                 </a>
 
                 <div class="menu-title">Management</div>
-                <a href="#" class="menu-item">
+                <a href="user_mang.php" class="menu-item">
                     <i class="fas fa-users"></i>
                     <span>Users</span>
                 </a>
