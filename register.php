@@ -56,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,30 +65,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #1a365d; /* Deep blue */
-            --secondary: #2a9d8f; /* Teal */
-            --accent: #f4a261; /* Sandy orange */
-            --light: #f8f9fa; /* Light background */
-            --dark: #1b263b; /* Darker navy */
-            --text: #333;
-            --gray: #6c757d;
+            --bg: #121212;
+            --surface: #1e1e1e;
+            --surface-light: #2a2a2a;
+            --border: #333333;
+            --text: #f5f5f5;
+            --text-muted: #aaaaaa;
+            --accent: #FFD700;
+            --accent-dark: #d4b000;
             --danger: #e76f51;
             --success: #2a9d8f;
-            --warning: #e9c46a;
-            --info: #4cc9f0;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --transition: all 0.3s ease;
-        }
-
-        /* Dark mode variables */
-        .dark-mode {
-            --primary: #0a1128;
-            --secondary: #1a7e72;
-            --light: #121212;
-            --dark: #e0e0e0;
-            --text: #f0f0f0;
-            --gray: #9e9e9e;
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
         }
 
         * {
@@ -99,19 +86,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
             color: var(--text);
             line-height: 1.6;
-            position: relative;
             min-height: 100vh;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="%231a365d" opacity="0.03"/><path d="M0,100 Q50,50 100,100 T200,100" stroke="%23f4a261" stroke-width="1" fill="none" opacity="0.1"/></svg>');
+            display: flex;
+            flex-direction: column;
             transition: var(--transition);
-        }
-
-        h1, h2, h3, h4 {
-            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-            font-weight: 700;
         }
 
         .container {
@@ -121,52 +103,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 0 20px;
         }
 
-        .btn {
-            display: inline-block;
-            padding: 14px 32px;
-            background-color: var(--secondary);
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: var(--transition);
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            box-shadow: var(--shadow);
-        }
-
-        .btn:hover {
-            background-color: #1a7e72;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--secondary);
-            color: var(--secondary);
-        }
-
-        .btn-outline:hover {
-            background-color: var(--secondary);
-            color: white;
-        }
-
         /* Header Styles */
         header {
-            background: linear-gradient(135deg, var(--primary) 0%, #1a365d 100%);
-            padding: 15px 0;
-            box-shadow: var(--shadow);
+            background: var(--surface);
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
         }
 
         .header-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: relative;
         }
 
         .logo {
@@ -183,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .logo-text {
             font-size: 24px;
             font-weight: 800;
-            color: white;
+            color: var(--text);
             letter-spacing: 1px;
         }
 
@@ -191,11 +138,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--accent);
         }
 
-        /* Theme Toggle Button */
         .theme-toggle {
             background: transparent;
             border: none;
-            color: white;
+            color: var(--text);
             font-size: 20px;
             cursor: pointer;
             transition: var(--transition);
@@ -215,9 +161,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         /* Register Section */
         .register-section {
             display: flex;
-            min-height: calc(100vh - 70px);
+            flex: 1;
             align-items: center;
-            padding: 60px 0;
+            padding: 4rem 0;
         }
 
         .register-container {
@@ -225,51 +171,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             width: 100%;
             max-width: 1000px;
             margin: 0 auto;
-            background: white;
+            background: var(--surface);
             border-radius: 12px;
             overflow: hidden;
             box-shadow: var(--shadow);
-        }
-
-        .dark-mode .register-container {
-            background-color: #1e1e1e;
+            border: 1px solid var(--border);
         }
 
         .register-image {
             flex: 1;
-            background: linear-gradient(135deg, rgba(26, 54, 93, 0.9) 0%, rgba(42, 157, 143, 0.8) 100%), 
-                        url('https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1556740738-b6a63e27c4df') center/cover no-repeat;
+            padding: 3rem;
+            color: white;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 40px;
-            color: white;
-            position: relative;
         }
 
         .register-image h2 {
-            font-size: 32px;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
         }
 
         .register-image p {
-            margin-bottom: 30px;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
             opacity: 0.9;
-            position: relative;
-            z-index: 1;
         }
 
         .register-image ul {
             list-style: none;
-            margin-bottom: 40px;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 2.5rem;
         }
 
         .register-image li {
-            margin-bottom: 15px;
+            margin-bottom: 1rem;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -281,37 +220,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .register-form {
             flex: 1;
-            padding: 60px 40px;
-        }
-
-        .dark-mode .register-form {
-            color: var(--text);
+            padding: 3rem;
         }
 
         .form-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 2.5rem;
         }
 
         .form-header h2 {
-            font-size: 32px;
-            color: var(--primary);
-            margin-bottom: 10px;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
         }
 
         .form-header p {
-            color: var(--gray);
+            color: var(--text-muted);
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 0.5rem;
             font-weight: 500;
-            color: var(--dark);
+            color: var(--text);
         }
 
         .input-with-icon {
@@ -323,88 +259,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gray);
+            color: var(--text-muted);
         }
 
         .form-control {
             width: 100%;
-            padding: 14px 20px 14px 45px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: var(--transition);
-            background-color: var(--light);
+            padding: 0.875rem 1rem 0.875rem 3rem;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
             color: var(--text);
-        }
-
-        .dark-mode .form-control {
-            border-color: #444;
-            background-color: #2d2d2d;
+            transition: var(--transition);
         }
 
         .form-control:focus {
-            border-color: var(--secondary);
+            border-color: var(--accent);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.2);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
         }
 
         .select-control {
             width: 100%;
-            padding: 14px 20px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: var(--transition);
-            background-color: var(--light);
+            padding: 0.875rem 1rem;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
             color: var(--text);
+            transition: var(--transition);
             appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23aaaaaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: right 1rem center;
             background-size: 1em;
         }
 
-        .dark-mode .select-control {
-            border-color: #444;
-            background-color: #2d2d2d;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-        }
-
         .select-control:focus {
-            border-color: var(--secondary);
+            border-color: var(--accent);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.2);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
         }
 
         .radio-group {
             display: flex;
-            gap: 20px;
-            margin-top: 10px;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
         }
 
         .radio-option {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
         }
 
         .radio-option input {
-            width: 16px;
-            height: 16px;
+            accent-color: var(--accent);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.875rem 2rem;
+            background: var(--accent);
+            color: #000;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
         }
 
         .form-footer {
-            margin-top: 30px;
+            margin-top: 2rem;
             text-align: center;
         }
 
         .form-footer p {
-            margin-top: 20px;
-            color: var(--gray);
+            margin-top: 1.5rem;
+            color: var(--text-muted);
         }
 
         .form-footer a {
-            color: var(--secondary);
+            color: var(--accent);
             text-decoration: none;
             font-weight: 500;
         }
@@ -413,17 +357,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-decoration: underline;
         }
 
+        /* Alert Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .alert-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
         /* Footer */
         footer {
-            background: linear-gradient(135deg, var(--primary) 0%, #1a365d 100%);
-            color: white;
-            padding: 30px 0;
-            text-align: center;
+            background: var(--surface);
+            color: var(--text-muted);
+            padding: 2rem 0;
+            margin-top: auto;
+            border-top: 1px solid var(--border);
         }
 
         .copyright {
-            font-size: 14px;
-            opacity: 0.8;
+            font-size: 0.9rem;
+            text-align: center;
         }
 
         /* Responsive Styles */
@@ -434,30 +392,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             .register-image {
-                padding: 30px;
+                padding: 2rem;
             }
             
             .register-form {
-                padding: 40px 30px;
+                padding: 2rem;
             }
         }
 
         @media (max-width: 576px) {
-            .register-image h2 {
-                font-size: 26px;
-            }
-            
-            .form-header h2 {
-                font-size: 26px;
+            .register-image h2, .form-header h2 {
+                font-size: 1.75rem;
             }
             
             .form-control {
-                padding: 12px 15px 12px 40px;
+                padding: 0.75rem 1rem 0.75rem 3rem;
             }
             
             .radio-group {
                 flex-direction: column;
-                gap: 10px;
+                gap: 0.75rem;
             }
         }
     </style>
@@ -502,70 +456,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <p>Fill in your details to register</p>
                     </div>
                     
-                    <?php
-                    // Initialize variables
-                    $fullName = $email = $phone = $userType = $department = '';
-                    $errors = [];
-                    
-                    // Check if form is submitted
-                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                        // Validate and sanitize inputs
-                        $fullName = htmlspecialchars(trim($_POST['fullName'] ?? ''));
-                        $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
-                        $phone = htmlspecialchars(trim($_POST['phone'] ?? ''));
-                        $userType = htmlspecialchars(trim($_POST['userType'] ?? ''));
-                        $department = htmlspecialchars(trim($_POST['department'] ?? ''));
-                        $password = $_POST['password'] ?? '';
-                        $confirmPassword = $_POST['confirmPassword'] ?? '';
-                        
-                        // Validation
-                        if (empty($fullName)) {
-                            $errors['fullName'] = 'Full name is required';
-                        }
-                        
-                        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                            $errors['email'] = 'Valid email is required';
-                        }
-                        
-                        if (empty($phone)) {
-                            $errors['phone'] = 'Phone number is required';
-                        }
-                        
-                        if (empty($userType) || !in_array($userType, ['admin', 'staff'])) {
-                            $errors['userType'] = 'Please select a valid user type';
-                        }
-                        
-                        if (empty($department)) {
-                            $errors['department'] = 'Please select a department';
-                        }
-                        
-                        if (empty($password)) {
-                            $errors['password'] = 'Password is required';
-                        } elseif (strlen($password) < 8) {
-                            $errors['password'] = 'Password must be at least 8 characters';
-                        }
-                        
-                        if ($password !== $confirmPassword) {
-                            $errors['confirmPassword'] = 'Passwords do not match';
-                        }
-                        
-                        // If no errors, process registration
-                        if (empty($errors)) {
-                            // In a real application, you would:
-                            // 1. Hash the password
-                            // 2. Save to database
-                            // 3. Redirect to success page or login
-                            
-                            // For demonstration, we'll just show a success message
-                            echo '<div class="alert alert-success" style="background-color: var(--success); color: white; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-                                Registration successful! You can now <a href="login.php" style="color: white; text-decoration: underline;">login</a>.
-                            </div>';
-                            
-                            // Reset form fields
-                            $fullName = $email = $phone = $userType = $department = '';
-                        }
-                    }
-                    ?>
+                    <?php if (!empty($message)): ?>
+                        <div class="alert alert-danger">
+                            <?php echo $message; ?>
+                        </div>
+                    <?php endif; ?>
                     
                     <form id="registrationForm" method="POST" action="">
                         <div class="form-group">
@@ -573,11 +468,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="input-with-icon">
                                 <i class="fas fa-user"></i>
                                 <input type="text" id="fullName" name="fullName" class="form-control" placeholder="John Smith" 
-                                       value="<?php echo htmlspecialchars($fullName); ?>" required>
+                                       value="<?php echo htmlspecialchars($_POST['fullName'] ?? ''); ?>" required>
                             </div>
-                            <?php if (isset($errors['fullName'])): ?>
-                                <small style="color: var(--danger);"><?php echo $errors['fullName']; ?></small>
-                            <?php endif; ?>
                         </div>
                         
                         <div class="form-group">
@@ -585,11 +477,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="input-with-icon">
                                 <i class="fas fa-envelope"></i>
                                 <input type="email" id="email" name="email" class="form-control" placeholder="john@example.com" 
-                                       value="<?php echo htmlspecialchars($email); ?>" required>
+                                       value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" required>
                             </div>
-                            <?php if (isset($errors['email'])): ?>
-                                <small style="color: var(--danger);"><?php echo $errors['email']; ?></small>
-                            <?php endif; ?>
                         </div>
                         
                         <div class="form-group">
@@ -597,11 +486,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="input-with-icon">
                                 <i class="fas fa-phone"></i>
                                 <input type="tel" id="phone" name="phone" class="form-control" placeholder="+1 (555) 123-4567" 
-                                       value="<?php echo htmlspecialchars($phone); ?>" required>
+                                       value="<?php echo htmlspecialchars($_POST['phone'] ?? ''); ?>" required>
                             </div>
-                            <?php if (isset($errors['phone'])): ?>
-                                <small style="color: var(--danger);"><?php echo $errors['phone']; ?></small>
-                            <?php endif; ?>
                         </div>
                         
                         <div class="form-group">
@@ -609,33 +495,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="radio-group">
                                 <div class="radio-option">
                                     <input type="radio" id="admin" name="userType" value="admin" 
-                                           <?php echo ($userType === 'admin') ? 'checked' : ''; ?> required>
+                                           <?php echo ($_POST['userType'] ?? '') === 'admin' ? 'checked' : ''; ?> required>
                                     <label for="admin">Administrator</label>
                                 </div>
                                 <div class="radio-option">
                                     <input type="radio" id="staff" name="userType" value="staff" 
-                                           <?php echo ($userType === 'staff') ? 'checked' : ''; ?> required>
+                                           <?php echo ($_POST['userType'] ?? '') === 'staff' ? 'checked' : ''; ?> required>
                                     <label for="staff">Staff Member</label>
                                 </div>
                             </div>
-                            <?php if (isset($errors['userType'])): ?>
-                                <small style="color: var(--danger);"><?php echo $errors['userType']; ?></small>
-                            <?php endif; ?>
                         </div>
                         
                         <div class="form-group">
                             <label for="department">Department</label>
                             <select id="department" name="department" class="select-control" required>
                                 <option value="">Select Department</option>
-                                <option value="inventory" <?php echo ($department === 'inventory') ? 'selected' : ''; ?>>Inventory Management</option>
-                                <option value="shipping" <?php echo ($department === 'shipping') ? 'selected' : ''; ?>>Shipping & Receiving</option>
-                                <option value="quality" <?php echo ($department === 'quality') ? 'selected' : ''; ?>>Quality Control</option>
-                                <option value="logistics" <?php echo ($department === 'logistics') ? 'selected' : ''; ?>>Logistics</option>
-                                <option value="admin" <?php echo ($department === 'admin') ? 'selected' : ''; ?>>Administration</option>
+                                <option value="inventory" <?php echo ($_POST['department'] ?? '') === 'inventory' ? 'selected' : ''; ?>>Inventory Management</option>
+                                <option value="shipping" <?php echo ($_POST['department'] ?? '') === 'shipping' ? 'selected' : ''; ?>>Shipping & Receiving</option>
+                                <option value="quality" <?php echo ($_POST['department'] ?? '') === 'quality' ? 'selected' : ''; ?>>Quality Control</option>
+                                <option value="logistics" <?php echo ($_POST['department'] ?? '') === 'logistics' ? 'selected' : ''; ?>>Logistics</option>
+                                <option value="admin" <?php echo ($_POST['department'] ?? '') === 'admin' ? 'selected' : ''; ?>>Administration</option>
                             </select>
-                            <?php if (isset($errors['department'])): ?>
-                                <small style="color: var(--danger);"><?php echo $errors['department']; ?></small>
-                            <?php endif; ?>
                         </div>
                         
                         <div class="form-group">
@@ -644,9 +524,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <i class="fas fa-lock"></i>
                                 <input type="password" id="password" name="password" class="form-control" placeholder="Create a password" required>
                             </div>
-                            <?php if (isset($errors['password'])): ?>
-                                <small style="color: var(--danger);"><?php echo $errors['password']; ?></small>
-                            <?php endif; ?>
                         </div>
                         
                         <div class="form-group">
@@ -655,13 +532,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <i class="fas fa-lock"></i>
                                 <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm your password" required>
                             </div>
-                            <?php if (isset($errors['confirmPassword'])): ?>
-                                <small style="color: var(--danger);"><?php echo $errors['confirmPassword']; ?></small>
-                            <?php endif; ?>
                         </div>
                         
-                        <div class="form-group" style="margin-top: 30px;">
-                            <button type="submit" class="btn" style="width: 100%;">
+                        <div class="form-group">
+                            <button type="submit" class="btn">
                                 <i class="fas fa-user-plus"></i> Register Account
                             </button>
                         </div>
@@ -690,28 +564,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const icon = themeToggle.querySelector('i');
         
         function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
+            document.body.classList.toggle('light-mode');
             
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode);
+            const isLightMode = document.body.classList.contains('light-mode');
+            localStorage.setItem('lightMode', isLightMode);
             
             // Change icon based on mode
-            if (isDarkMode) {
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
+            if (isLightMode) {
+                icon.classList.replace('fa-moon', 'fa-sun');
             } else {
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
+                icon.classList.replace('fa-sun', 'fa-moon');
             }
         }
         
         themeToggle.addEventListener('click', toggleTheme);
 
         // Check for saved theme preference
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-            icon.classList.remove('fa-moon');
-            icon.classList.add('fa-sun');
+        if (localStorage.getItem('lightMode') === 'true') {
+            document.body.classList.add('light-mode');
+            icon.classList.replace('fa-moon', 'fa-sun');
         }
     </script>
 </body>
