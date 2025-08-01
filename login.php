@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'conn.php'; // Ensure this file establishes a $conn variable
+require 'conn.php';
 
 $message = "";
 
@@ -48,30 +48,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #1a365d; /* Deep blue */
-            --secondary: #2a9d8f; /* Teal */
-            --accent: #f4a261; /* Sandy orange */
-            --light: #f8f9fa; /* Light background */
-            --dark: #1b263b; /* Darker navy */
-            --text: #333;
-            --gray: #6c757d;
-            --danger: #e76f51;
-            --success: #2a9d8f;
-            --warning: #e9c46a;
-            --info: #4cc9f0;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --transition: all 0.3s ease;
-        }
-
-        /* Dark mode variables */
-        .dark-mode {
-            --primary: #0a1128;
-            --secondary: #1a7e72;
-            --light: #121212;
-            --dark: #e0e0e0;
-            --text: #f0f0f0;
-            --gray: #9e9e9e;
+            --bg: #121212;
+            --surface: #1e1e1e;
+            --surface-light: #2a2a2a;
+            --border: #333333;
+            --text: #f5f5f5;
+            --text-muted: #aaaaaa;
+            --accent: #FFD700;
+            --accent-dark: #d4b000;
+            --danger: #ef4444;
+            --success: #10b981;
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
         }
 
         * {
@@ -81,19 +69,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
             color: var(--text);
             line-height: 1.6;
-            position: relative;
             min-height: 100vh;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="%231a365d" opacity="0.03"/><path d="M0,100 Q50,50 100,100 T200,100" stroke="%23f4a261" stroke-width="1" fill="none" opacity="0.1"/></svg>');
-            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
         }
 
-        h1, h2, h3, h4 {
-            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-            font-weight: 700;
+        /* Header Styles */
+        header {
+            background: var(--surface);
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
         }
 
         .container {
@@ -103,52 +92,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 0 20px;
         }
 
-        .btn {
-            display: inline-block;
-            padding: 14px 32px;
-            background-color: var(--secondary);
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: var(--transition);
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            box-shadow: var(--shadow);
-        }
-
-        .btn:hover {
-            background-color: #1a7e72;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--secondary);
-            color: var(--secondary);
-        }
-
-        .btn-outline:hover {
-            background-color: var(--secondary);
-            color: white;
-        }
-
-        /* Header Styles */
-        header {
-            background: linear-gradient(135deg, var(--primary) 0%, #1a365d 100%);
-            padding: 15px 0;
-            box-shadow: var(--shadow);
-        }
-
         .header-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: relative;
         }
 
         .logo {
@@ -165,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .logo-text {
             font-size: 24px;
             font-weight: 800;
-            color: white;
+            color: var(--text);
             letter-spacing: 1px;
         }
 
@@ -173,33 +120,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--accent);
         }
 
-        /* Theme Toggle Button */
-        .theme-toggle {
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            transition: var(--transition);
-            padding: 8px;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .theme-toggle:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
         /* Login Section */
         .login-section {
+            flex: 1;
             display: flex;
-            min-height: calc(100vh - 70px);
             align-items: center;
-            padding: 60px 0;
+            padding: 4rem 0;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1600585152220-90363fe7e115') center/cover no-repeat;
         }
 
         .login-container {
@@ -207,47 +135,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             width: 100%;
             max-width: 1000px;
             margin: 0 auto;
-            background: white;
+            background: var(--surface);
             border-radius: 12px;
             overflow: hidden;
             box-shadow: var(--shadow);
-        }
-
-        .dark-mode .login-container {
-            background-color: #1e1e1e;
+            border: 1px solid var(--border);
         }
 
         .login-image {
             flex: 1;
-            background: linear-gradient(135deg, rgba(26, 54, 93, 0.9) 0%, rgba(42, 157, 143, 0.8) 100%), 
-                        url('https://images.unsplash.com/photo-1600585152220-90363fe7e115?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
+            padding: 40px;
+            color: var(--text);
+            position: relative;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 40px;
-            color: white;
-            position: relative;
         }
 
         .login-image h2 {
             font-size: 32px;
             margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
+            color: var(--accent);
         }
 
         .login-image p {
             margin-bottom: 30px;
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
+            color: var(--text-muted);
         }
 
         .login-image ul {
             list-style: none;
             margin-bottom: 40px;
-            position: relative;
-            z-index: 1;
         }
 
         .login-image li {
@@ -255,6 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             gap: 10px;
+            color: var(--text-muted);
         }
 
         .login-image i {
@@ -264,10 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .login-form {
             flex: 1;
             padding: 60px 40px;
-        }
-
-        .dark-mode .login-form {
-            color: var(--text);
+            background: var(--surface-light);
         }
 
         .form-header {
@@ -277,12 +193,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .form-header h2 {
             font-size: 32px;
-            color: var(--primary);
+            color: var(--accent);
             margin-bottom: 10px;
         }
 
         .form-header p {
-            color: var(--gray);
+            color: var(--text-muted);
         }
 
         .form-group {
@@ -293,7 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: var(--dark);
+            color: var(--text);
         }
 
         .input-with-icon {
@@ -305,29 +221,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gray);
+            color: var(--text-muted);
         }
 
         .form-control {
             width: 100%;
             padding: 14px 20px 14px 45px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 16px;
             transition: var(--transition);
-            background-color: var(--light);
+            background: var(--surface);
             color: var(--text);
         }
 
-        .dark-mode .form-control {
-            border-color: #444;
-            background-color: #2d2d2d;
-        }
-
         .form-control:focus {
-            border-color: var(--secondary);
+            border-color: var(--accent);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.2);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
         }
 
         .remember-forgot {
@@ -341,21 +252,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             gap: 8px;
+            color: var(--text-muted);
         }
 
         .remember-me input {
             width: 16px;
             height: 16px;
+            accent-color: var(--accent);
         }
 
         .forgot-password {
-            color: var(--secondary);
+            color: var(--accent);
             text-decoration: none;
             font-weight: 500;
         }
 
         .forgot-password:hover {
             text-decoration: underline;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background-color: var(--accent);
+            color: #000;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: var(--shadow);
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-dark);
+            transform: translateY(-2px);
         }
 
         .form-footer {
@@ -365,11 +301,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .form-footer p {
             margin-top: 20px;
-            color: var(--gray);
+            color: var(--text-muted);
         }
 
         .form-footer a {
-            color: var(--secondary);
+            color: var(--accent);
             text-decoration: none;
             font-weight: 500;
         }
@@ -386,7 +322,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .social-login p {
             position: relative;
-            color: var(--gray);
+            color: var(--text-muted);
             margin-bottom: 20px;
         }
 
@@ -396,13 +332,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             position: absolute;
             height: 1px;
             width: 30%;
-            background-color: #ddd;
+            background-color: var(--border);
             top: 50%;
-        }
-
-        .dark-mode .social-login p::before,
-        .dark-mode .social-login p::after {
-            background-color: #444;
         }
 
         .social-login p::before {
@@ -450,15 +381,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         /* Footer */
         footer {
-            background: linear-gradient(135deg, var(--primary) 0%, #1a365d 100%);
-            color: white;
-            padding: 30px 0;
+            background: var(--surface);
+            color: var(--text-muted);
+            padding: 2rem 0;
+            border-top: 1px solid var(--border);
             text-align: center;
         }
 
         .copyright {
             font-size: 14px;
-            opacity: 0.8;
+        }
+
+        /* Message Styles */
+        .message {
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+            border-left: 3px solid transparent;
+        }
+
+        .message-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left-color: var(--danger);
+            color: var(--danger);
         }
 
         /* Responsive Styles */
@@ -508,9 +453,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="logo-text">Warehouse<span>Pro</span></div>
             </div>
-            <button class="theme-toggle" id="themeToggle">
-                <i class="fas fa-moon"></i>
-            </button>
         </div>
     </header>
 
@@ -529,21 +471,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <li><i class="fas fa-check-circle"></i> Multi-location support</li>
                     </ul>
                     
-                    <p>Don't have an account? <a href="registerx.php" style="color: var(--accent); font-weight: 500;"> click here</a></p>
+                    <p>Don't have an account? <a href="register.php" style="color: var(--accent); font-weight: 500;">click here</a></p>
                 </div>
                 
-                <div class="login-form"  >>
+                <div class="login-form">
                     <div class="form-header">
                         <h2>Sign In</h2>
                         <p>Enter your credentials to access your account</p>
+                        <?php if (!empty($message)): ?>
+                            <div class="message message-error">
+                                <i class="fas fa-exclamation-circle"></i> <?= $message ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     
-                    <form id="loginForm" method="POST" action="dashboard.php">
+                    <form id="loginForm" method="POST" action="">
                         <div class="form-group">
                             <label for="email">Email Address</label>
                             <div class="input-with-icon">
                                 <i class="fas fa-envelope"></i>
-                                <input type="email" id="email" class="form-control" placeholder="john@example.com" required>
+                                <input type="email" id="email" name="email" class="form-control" placeholder="john@example.com" required>
                             </div>
                         </div>
                         
@@ -551,20 +498,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label for="password">Password</label>
                             <div class="input-with-icon">
                                 <i class="fas fa-lock"></i>
-                                <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+                                <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
                             </div>
                         </div>
                         
                         <div class="remember-forgot">
                             <div class="remember-me">
-                                <input type="checkbox" id="remember">
+                                <input type="checkbox" id="remember" name="remember">
                                 <label for="remember">Remember me</label>
                             </div>
                             <a href="#" class="forgot-password">Forgot password?</a>
                         </div>
                         
                         <div class="form-group" style="margin-top: 30px;">
-                            <button type="submit" class="btn" style="width: 100%;">
+                            <button type="submit" class="btn">
                                 <i class="fas fa-sign-in-alt"></i> Sign In
                             </button>
                         </div>
@@ -603,8 +550,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </footer>
 
     <script>
-    
-
         // Social login buttons
         document.querySelectorAll('.social-icon').forEach(icon => {
             icon.addEventListener('click', function() {
@@ -614,35 +559,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // In a real app, this would redirect to the OAuth provider
             });
         });
-
-        // Theme toggle functionality
-        const themeToggle = document.getElementById('themeToggle');
-        const icon = themeToggle.querySelector('i');
-        
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode);
-            
-            // Change icon based on mode
-            if (isDarkMode) {
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-            } else {
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-            }
-        }
-        
-        themeToggle.addEventListener('click', toggleTheme);
-
-        // Check for saved theme preference
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-            icon.classList.remove('fa-moon');
-            icon.classList.add('fa-sun');
-        }
 
         // Forgot password functionality
         document.querySelector('.forgot-password').addEventListener('click', function(e) {
@@ -654,4 +570,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     </script>
 </body>
-</html> 
+</html>
