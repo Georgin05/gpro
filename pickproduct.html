@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMS Packing Station</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .order-info {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .order-info div {
+            background-color: var(--dark);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .packing-area {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        
+        .instructions {
+            background-color: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .instructions h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .items-list {
+            margin-bottom: 20px;
+        }
+        
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .item-image {
+            width: 50px;
+            height: 50px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .item-details {
+            flex-grow: 1;
+        }
+        
+        .item-name {
+            font-weight: bold;
+        }
+        
+        .item-sku {
+            font-size: 12px;
+            color: #777;
+        }
+        
+        .item-quantity {
+            font-weight: bold;
+            color: var(--secondary);
+        }
+        
+        .packing-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .box-selection, .packing-materials, .shipping-info {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        
+        .box-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .box-option {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .box-option:hover {
+            border-color: var(--secondary);
+        }
+        
+        .box-option.selected {
+            border-color: var(--secondary);
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .materials-list {
+            margin-top: 10px;
+        }
+        
+        .material-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .material-item:last-child {
+            border-bottom: none;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--success);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .btn-large {
+            padding: 12px 24px;
+            font-size: 16px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #777;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .order-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>WMS Packing Station</h1>
+            <div class="order-info">
+                <div>Order: #ORD-7842</div>
+                <div>Priority: Standard</div>
+                <div>Destination: US West</div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="packing-area">
+                <div class="instructions">
+                    <h3>Packing Instructions</h3>
+                    <p>Pack items securely using appropriate box size. Use bubble wrap for fragile items. Ensure weight is evenly distributed. Include packing slip before sealing.</p>
+                </div>
+                
+                <div class="items-list">
+                    <div class="item">
+                        <div class="item-info">
+                            <div class="item-image">📦</div>
+                            <div class="item-details">
+                                <div class="item-name">Wireless Headphones</div>
+                                <div class="item-sku">SKU: WH-2045-BLK</div>
+                            </div>
+                        </div>
+                        <div class="item-quantity">Qty: 1</div>
+                        <div class="packing-controls">
+                            <button class="btn-primary">Mark Packed</button>
+                        </div>
+                    </div>
+                    
+                    <div class="item">
+                        <div class="item-info">
+                            <div class="item-image">📦</div>
+                            <div class="item-details">
+                                <div class="item-name">Bluetooth Speaker</div>
+                                <div class="item-sku">SKU: BS-3012-BLU</div>
+                            </div>
+                        </div>
+                        <div class="item-quantity">Qty: 2</div>
+                        <div class="packing-controls">
+                            <button class="btn-primary">Mark Packed</button>
+                        </div>
+                    </div>
+                    
+                    <div class="item">
+                        <div class="item-info">
+                            <div class="item-image">📦</div>
+                            <div class="item-details">
+                                <div class="item-name">Phone Charger</div>
+                                <div class="item-sku">SKU: PC-1098-USB</div>
+                            </div>
+                        </div>
+                        <div class="item-quantity">Qty: 1</div>
+                        <div class="packing-controls">
+                            <button class="btn-primary">Mark Packed</button>
+                        </div>
+                    </div>
+                    
+                    <div class="item">
+                        <div class="item-info">
+                            <div class="item-image">📦</div>
+                            <div class="item-details">
+                                <div class="item-name">Smart Watch</div>
+                                <div class="item-sku">SKU: SW-4057-SLV</div>
+                            </div>
+                        </div>
+                        <div class="item-quantity">Qty: 1</div>
+                        <div class="packing-controls">
+                            <button class="btn-primary">Mark Packed</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <h3>Packing Progress</h3>
+                    <div class="progress-bar">
+                        <div class="progress" id="packing-progress"></div>
+                    </div>
+                    <div id="progress-text">0% Complete</div>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="box-selection">
+                    <h3>Select Box Size</h3>
+                    <div class="box-options">
+                        <div class="box-option" data-size="small">
+                            <h4>Small</h4>
+                            <p>8×6×4 in</p>
+                        </div>
+                        <div class="box-option selected" data-size="medium">
+                            <h4>Medium</h4>
+                            <p>12×9×6 in</p>
+                        </div>
+                        <div class="box-option" data-size="large">
+                            <h4>Large</h4>
+                            <p>18×12×8 in</p>
+                        </div>
+                        <div class="box-option" data-size="x-large">
+                            <h4>X-Large</h4>
+                            <p>24×18×12 in</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="packing-materials">
+                    <h3>Packing Materials</h3>
+                    <div class="materials-list">
+                        <div class="material-item">
+                            <span>Bubble Wrap</span>
+                            <span>Available</span>
+                        </div>
+                        <div class="material-item">
+                            <span>Packing Paper</span>
+                            <span>Available</span>
+                        </div>
+                        <div class="material-item">
+                            <span>Air Pillows</span>
+                            <span>Available</span>
+                        </div>
+                        <div class="material-item">
+                            <span>Foam Sheets</span>
+                            <span>Available</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="shipping-info">
+                    <h3>Shipping Information</h3>
+                    <p><strong>Carrier:</strong> Standard Shipping</p>
+                    <p><strong>Service:</strong> Ground</p>
+                    <p><strong>Weight:</strong> <span id="total-weight">0</span> lbs</p>
+                    <p><strong>Dimensions:</strong> <span id="box-dimensions">12×9×6 in</span></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="btn-warning btn-large">Need Assistance</button>
+            <button class="btn-success btn-large" id="complete-btn">Complete Packing</button>
+        </div>
+        
+        <footer>
+            <p>WMS Packing Module v2.1 • © 2023 Warehouse Management Systems</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Box selection
+            const boxOptions = document.querySelectorAll('.box-option');
+            boxOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    boxOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    // Update shipping info
+                    const size = this.getAttribute('data-size');
+                    let dimensions = '';
+                    switch(size) {
+                        case 'small':
+                            dimensions = '8×6×4 in';
+                            break;
+                        case 'medium':
+                            dimensions = '12×9×6 in';
+                            break;
+                        case 'large':
+                            dimensions = '18×12×8 in';
+                            break;
+                        case 'x-large':
+                            dimensions = '24×18×12 in';
+                            break;
+                    }
+                    document.getElementById('box-dimensions').textContent = dimensions;
+                });
+            });
+            
+            // Mark items as packed
+            const packButtons = document.querySelectorAll('.packing-controls button');
+            const progressBar = document.getElementById('packing-progress');
+            const progressText = document.getElementById('progress-text');
+            const completeBtn = document.getElementById('complete-btn');
+            let packedItems = 0;
+            const totalItems = packButtons.length;
+            
+            packButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    if (this.textContent === 'Mark Packed') {
+                        this.textContent = 'Packed';
+                        this.classList.remove('btn-primary');
+                        this.classList.add('btn-success');
+                        this.disabled = true;
+                        
+                        // Update progress
+                        packedItems++;
+                        const progress = (packedItems / totalItems) * 100;
+                        progressBar.style.width = `${progress}%`;
+                        progressText.textContent = `${Math.round(progress)}% Complete`;
+                        
+                        // Update weight (simulated)
+                        document.getElementById('total-weight').textContent = Math.round(packedItems * 1.2);
+                    }
+                });
+            });
+            
+            // Complete packing process
+            completeBtn.addEventListener('click', function() {
+                if (packedItems === totalItems) {
+                    alert('Packing completed successfully! This order is ready for shipping.');
+                    // Here you would typically send data to the server
+                } else {
+                    alert(`Please pack all items before completing. ${totalItems - packedItems} item(s) remaining.`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
